@@ -40,7 +40,7 @@ Sri Lanka Weather Hub is a self-contained, realistic mock weather application co
 
 
 - Dashboard  
-  ![Main Dashboard](screenshots/dashboard.png)
+  ![Main Dashboard](https://github.com/reezmahanan/Weather-App/blob/main/weather%20hub.png)
 
 
 
