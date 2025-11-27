@@ -36,20 +36,13 @@ Table of Contents
 ## About
 Sri Lanka Weather Hub is a self-contained, realistic mock weather application covering all 25 Sri Lankan districts. It simulates weather changes over time without requiring external APIs and is designed for local development (XAMPP).
 
-## Screenshots
-(Place your images in a `screenshots/` directory using the filenames below; placeholders are shown.)
+## Screenshot
 
-- Main Dashboard  
+
+- Dashboard  
   ![Main Dashboard](screenshots/dashboard.png)
 
-- All Districts View  
-  ![All Districts](screenshots/all-districts.png)
 
-- Mobile Responsive  
-  ![Mobile View](screenshots/mobile-view.png)
-
-- Single District Weather  
-  ![Single District](screenshots/single-district.png)
 
 ## Features
 - Realistic weather simulation that updates over time
