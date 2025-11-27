@@ -15,7 +15,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/reezmahanan/Weather-App?style=social)](https://github.com/reezmahanan/Weather-App/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/reezmahanan/Weather-App?style=social)](https://github.com/reezmahanan/Weather-App/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/reezmahanan/Weather-App)](https://github.com/reezmahanan/Weather-App/issues)
-[![License: MIT](https://img.shields.io/github/license/reezmahanan/Weather-App)](LICENSE)
 
 </div>
 
@@ -29,6 +28,7 @@ Table of Contents
 - Quick Start
 - Usage
 - Customization
+- Future Implementations
 - Contributing
 - License
 - Author
@@ -38,11 +38,8 @@ Sri Lanka Weather Hub is a self-contained, realistic mock weather application co
 
 ## Screenshot
 
-
 - Dashboard  
   ![Main Dashboard](https://github.com/reezmahanan/Weather-App/blob/main/weather%20hub.png)
-
-
 
 ## Features
 - Realistic weather simulation that updates over time
@@ -109,6 +106,21 @@ Add / Modify Districts
 Database Config
 - Update DB host, port, user and password in the project's DB config file if your environment differs from the defaults.
 
+## Future Implementations
+Planned improvements and features that could be added in future updates:
+- Mobile-first responsive redesign and improved accessibility
+- Dark mode / theme switching
+- Optional real-time weather API integration (as a toggle) for live data
+- User favorites and saved views
+- Historical weather charts and simple analytics per district
+- Alert/notification system for extreme simulated weather
+- Localization (Sinhala/Tamil) and multi-language support
+- Docker compose setup for easier local development
+- Automated tests and CI pipeline (GitHub Actions)
+- Admin panel to edit districts, seed data, and simulation parameters
+- Export/import of district data (CSV/JSON)
+- Improved seeding options and adjustable simulation speed
+
 ## Contributing
 We welcome contributions! To contribute:
 1. Fork the repository
@@ -120,7 +132,7 @@ We welcome contributions! To contribute:
 Report bugs or request features by opening issues on the repository.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is provided for educational purposes only. No MIT license is applied in this README. If you would like a specific open source license (for example MIT, Apache 2.0, or GPL), let me know and I can add the appropriate LICENSE file and update this section.
 
 ## Author
 Reezma Hanan  
