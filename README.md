@@ -29,7 +29,7 @@
 ![Favorites Feature](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/view%20all%20location.png)
 *Quick access to favorite cities*
 
-![Weather Details](screenshots/weather-card.png)
+![Weather Details](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/area%20current%20weather.png)
 *Detailed weather information cards*
 
 
