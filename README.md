@@ -23,7 +23,7 @@
 
 ## 📸 Screenshots
 
-![Weather App Screenshot](screenshots/main.png)
+![Weather App Screenshot](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/dashboard.png)
 *Main dashboard with glassmorphism design and dynamic backgrounds*
 
 ![Favorites Feature](screenshots/favorites.png)
@@ -32,8 +32,7 @@
 ![Weather Details](screenshots/weather-card.png)
 *Detailed weather information cards*
 
-![Main Dashboard](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/dashboard.png)
-*Dashboard overview*
+
 
 ---
 
