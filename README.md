@@ -12,7 +12,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com/)
 [![XAMPP](https://img.shields.io/badge/XAMPP-FB7A24?style=for-the-badge&logo=xampp&logoColor=white)](https://apachefriends.org/)
 
-<<<<<<< HEAD
+
 [![GitHub stars](https://img.shields.io/github/stars/reezmahanan/Weather-App?style=social)](https://github.com/reezmahanan/Weather-App/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/reezmahanan/Weather-App?style=social)](https://github.com/reezmahanan/Weather-App/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/reezmahanan/Weather-App)](https://github.com/reezmahanan/Weather-App/issues)
@@ -32,7 +32,7 @@
 ![Weather Details](screenshots/weather-card.png)
 *Detailed weather information cards*
 
-![Main Dashboard](https://github.com/reezmahanan/Weather-App/blob/main/weather%20hub.png)
+![Main Dashboard](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/dashboard.png)
 *Dashboard overview*
 
 ---
