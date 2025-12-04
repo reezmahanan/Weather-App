@@ -5,48 +5,111 @@
 }
 
 :root {
-    --primary-blue: #4FC3F7;
-    --primary-green: #4DB6AC;
-    --secondary-blue: #81D4FA;
-    --secondary-green: #80CBC4;
-    --accent-teal: #26A69A;
-    --light-bg: #E0F7FA;
+    --primary-green: #00E676;
+    --primary-blue: #00B8D4;
+    --primary-purple: #9C27B0;
+    --secondary-green: #69F0AE;
+    --secondary-blue: #40C4FF;
+    --secondary-purple: #BA68C8;
+    --accent-teal: #00BFA5;
+    --light-bg: #E8F5E9;
     --card-bg: rgba(255, 255, 255, 0.95);
-    --text-dark: #2C3E50;
-    --text-light: #546E7A;
-    --shadow: 0 8px 32px rgba(79, 195, 247, 0.15);
+    --text-dark: #1B5E20;
+    --text-light: #004D40;
+    --shadow: 0 8px 32px rgba(156, 39, 176, 0.2);
 }
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%);
+    background: 
+        linear-gradient(135deg, rgba(0, 230, 118, 0.85) 0%, rgba(0, 184, 212, 0.85) 35%, rgba(156, 39, 176, 0.85) 70%, rgba(186, 104, 200, 0.85) 100%),
+        url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=1920&q=80') center/cover fixed;
+    background-size: 300% 300%, cover;
+    animation: gradientShift 20s ease infinite;
     min-height: 100vh;
     padding: 20px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1601134467661-3d775b999c8b?w=1920&q=80') center/cover;
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .container {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(35px) saturate(200%);
+    -webkit-backdrop-filter: blur(35px) saturate(200%);
     padding: 30px;
     border-radius: 25px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 8px 32px 0 rgba(156, 39, 176, 0.3),
+                0 0 60px rgba(0, 230, 118, 0.15),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
     max-width: 1200px;
     width: 100%;
     margin: 20px auto;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: rotateGlow 30s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotateGlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .header {
     text-align: center;
     margin-bottom: 30px;
-    padding: 20px;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--secondary-green));
+    padding: 30px 20px;
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.3), rgba(0, 184, 212, 0.3), rgba(156, 39, 176, 0.3));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-radius: 20px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 8px 32px 0 rgba(156, 39, 176, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.header-time {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .header::before {
@@ -60,20 +123,19 @@ body {
 }
 
 .header h1 {
-    color: var(--text-dark);
+    color: white;
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 10px;
-    background: linear-gradient(135deg, var(--text-dark), var(--accent-teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
 }
 
 .header p {
-    color: var(--text-light);
+    color: rgba(255, 255, 255, 0.95);
     font-size: 1.1rem;
-    font-weight: 300;
+    font-weight: 400;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .weather-form {
@@ -90,41 +152,66 @@ body {
 
 select {
     padding: 15px 20px;
-    width: 300px;
-    border: 2px solid var(--secondary-blue);
+    width: 350px;
+    max-width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 15px;
     font-size: 16px;
-    background: white;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(77, 182, 172, 0.1);
-    color: var(--text-dark);
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.2),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    color: #004D40;
+    cursor: pointer;
+    font-weight: 500;
 }
 
 select:focus {
     outline: none;
-    border-color: var(--accent-teal);
-    box-shadow: 0 4px 20px rgba(38, 166, 154, 0.3);
+    border-color: rgba(0, 230, 118, 0.5);
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 20px rgba(0, 230, 118, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
+}
+
+select option {
+    padding: 10px;
+    font-size: 15px;
+}
+
+select optgroup {
+    font-weight: 600;
+    color: #00897B;
+    font-size: 14px;
 }
 
 .btn-primary {
     padding: 15px 30px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.8), rgba(0, 184, 212, 0.8), rgba(156, 39, 176, 0.8));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: white;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 15px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(77, 182, 172, 0.4);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
     position: relative;
     overflow: hidden;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(77, 182, 172, 0.6);
+    background: linear-gradient(135deg, rgba(0, 230, 118, 1), rgba(0, 184, 212, 1), rgba(156, 39, 176, 1));
+    box-shadow: 0 8px 25px rgba(156, 39, 176, 0.6),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-primary:active {
@@ -144,17 +231,134 @@ select:focus {
 }
 
 .error-message {
-    background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(238, 90, 82, 0.3));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     color: white;
     padding: 15px 20px;
     border-radius: 15px;
     text-align: center;
     margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .error-icon {
     margin-right: 10px;
+}
+
+/* Favorites Section */
+.favorites-section {
+    margin: 25px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 16px rgba(0, 188, 212, 0.2);
+}
+
+.favorites-section h3 {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.favorite-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.3s ease;
+}
+
+.favorite-card:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+}
+
+.favorite-name {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    flex: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.favorite-name:hover {
+    color: #69F0AE;
+}
+
+.remove-fav {
+    background: rgba(255, 107, 107, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.remove-fav:hover {
+    background: rgba(255, 107, 107, 0.6);
+    transform: scale(1.1);
+}
+
+.favorite-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-family: 'Poppins', sans-serif;
+}
+
+.favorite-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+}
+
+.favorite-btn.favorited {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 193, 7, 0.3));
+}
+
+.favorite-btn.favorited:hover {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 193, 7, 0.4));
 }
 
 .weather-dashboard {
@@ -169,23 +373,33 @@ select:focus {
     flex-wrap: wrap;
     gap: 15px;
     padding: 20px;
-    background: linear-gradient(135deg, var(--light-bg), white);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 16px rgba(0, 188, 212, 0.15);
 }
 
 .dashboard-header h2 {
-    color: var(--text-dark);
+    color: white;
     font-size: 1.8rem;
     font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .last-updated {
-    background: var(--secondary-blue);
-    padding: 8px 15px;
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.3), rgba(156, 39, 176, 0.3));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 18px;
     border-radius: 20px;
     font-size: 0.9rem;
-    color: var(--text-dark);
+    color: white;
     font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(156, 39, 176, 0.2);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .weather-stats {
@@ -196,80 +410,98 @@ select:focus {
 }
 
 .stat-card {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.25), rgba(0, 184, 212, 0.25), rgba(156, 39, 176, 0.25));
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
     color: white;
     padding: 25px 20px;
     border-radius: 20px;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(77, 182, 172, 0.3);
-    transition: transform 0.3s ease;
+    box-shadow: 0 8px 25px rgba(156, 39, 176, 0.3),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.3s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.35), rgba(0, 184, 212, 0.35), rgba(156, 39, 176, 0.35));
+    box-shadow: 0 12px 30px rgba(156, 39, 176, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
 }
 
 .stat-icon {
     font-size: 2.5rem;
     margin-bottom: 15px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .stat-label {
     font-size: 0.9rem;
-    opacity: 0.9;
-    font-weight: 300;
+    opacity: 0.95;
+    font-weight: 400;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .table-container {
     overflow-x: auto;
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(79, 195, 247, 0.1);
-    border: 1px solid var(--secondary-blue);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 230, 118, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .weather-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: transparent;
     border-radius: 20px;
 }
 
 .weather-table th {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.4), rgba(0, 184, 212, 0.4), rgba(156, 39, 176, 0.4));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: white;
     padding: 18px 15px;
     text-align: left;
     font-weight: 600;
     font-size: 14px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .weather-table td {
     padding: 15px 12px;
-    border-bottom: 1px solid var(--light-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 14px;
-    color: var(--text-dark);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .weather-row:hover {
-    background: linear-gradient(135deg, var(--light-bg), white);
+    background: rgba(255, 255, 255, 0.15);
     transform: scale(1.01);
     transition: all 0.2s ease;
 }
 
 .district-name {
     font-weight: 600;
-    color: var(--text-dark);
+    color: white;
 }
 
 .temperature {
     font-weight: 600;
-    color: #E74C3C;
+    color: #FFD93D;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .weather-desc {
@@ -283,25 +515,31 @@ select:focus {
 }
 
 .humidity {
-    color: var(--primary-blue);
+    color: #69F0AE;
     font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .wind {
-    color: var(--accent-teal);
+    color: #80DEEA;
     font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .population, .area {
-    color: var(--text-light);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .weather-card {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.3), rgba(0, 184, 212, 0.3), rgba(156, 39, 176, 0.3));
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
     color: white;
     padding: 35px;
     border-radius: 25px;
-    box-shadow: 0 20px 40px rgba(77, 182, 172, 0.4);
+    box-shadow: 0 20px 40px rgba(156, 39, 176, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     margin-top: 20px;
     position: relative;
     overflow: hidden;
@@ -314,7 +552,8 @@ select:focus {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary-blue), var(--primary-green), var(--accent-teal));
+    background: linear-gradient(90deg, #00E676, #00B8D4, #9C27B0, #BA68C8);
+    opacity: 0.6;
 }
 
 .card-header {
@@ -327,20 +566,35 @@ select:focus {
 .card-header h2 {
     font-size: 1.8rem;
     font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-time {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-top: 8px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .weather-emoji-large {
     font-size: 3.5rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 }
 
 .last-updated-card {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 12px 18px;
     border-radius: 15px;
     text-align: center;
     margin-bottom: 20px;
     font-size: 0.9rem;
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .weather-details {
@@ -351,56 +605,74 @@ select:focus {
 
 .detail-item {
     background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     padding: 20px;
     border-radius: 15px;
-    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: transform 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 .detail-item:hover {
     transform: translateY(-3px);
     background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .detail-item .label {
     display: block;
     font-size: 0.9rem;
-    opacity: 0.9;
+    opacity: 0.95;
     margin-bottom: 8px;
-    font-weight: 300;
+    font-weight: 400;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .detail-item .value {
     display: block;
     font-size: 1.4rem;
     font-weight: 700;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .weather-note {
     text-align: center;
     margin-top: 25px;
     padding: 15px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-radius: 15px;
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.weather-note small {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.weather-note small {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .footer {
     text-align: center;
     margin-top: 40px;
-    padding-top: 25px;
-    border-top: 2px solid var(--light-bg);
-    color: var(--text-light);
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
     font-size: 0.9rem;
 }
 
 .footer p {
-    background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 600;
+    color: white;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive Design */
@@ -505,7 +777,8 @@ select:focus {
 
 .particle {
     position: absolute;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, #00E676, #00B8D4, #9C27B0);
     border-radius: 50%;
     animation: float 6s ease-in-out infinite;
+    opacity: 0.6;
 }
