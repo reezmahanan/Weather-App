@@ -32,7 +32,7 @@
 ![Weather Details](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/Temperature%20trend.png)
 *Detailed weather information Trends*
 
-![Weather Alerts](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/Weather%20Alerts.png)
+![Weather Alerts](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/Weather%20Aleart.png)
 *Real-time weather alerts and warnings*
 
 
