@@ -26,8 +26,8 @@
 ![Weather App Screenshot](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/dashboard.png)
 *Main dashboard with glassmorphism design and dynamic backgrounds*
 
-![Favorites Feature](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/view%20all%20location.png)
-*Quick access to favorite cities*
+![Favorites Feature](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/Weather%20Forcast.png)
+*Quick access to favorite cities weather Forcasts*
 
 ![Weather Details](https://github.com/reezmahanan/Weather-App/blob/main/screenshots/area%20current%20weather.png)
 *Detailed weather information cards*
