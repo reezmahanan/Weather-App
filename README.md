@@ -21,10 +21,13 @@ Real-time weather tracking application for 120+ locations across Sri Lanka, feat
 ## Screenshots
 
 <div align="center">
-
+**Dashboard**
 ![Dashboard](screenshots/dashboard.png)
+**Weather Forecast** 
 ![Weather Forecast](screenshots/Weather%20Forecast.png)
+**Temperature Analytics**  
 ![Temperature Analytics](screenshots/Temperature%20trend.png)
+**Weather Alerts**  
 ![Weather Alerts](screenshots/Weather%20Aleart.png)
 
 </div>
