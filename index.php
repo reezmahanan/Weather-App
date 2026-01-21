@@ -1,4 +1,9 @@
 <?php
+// Force no cache headers
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 session_start();
 date_default_timezone_set('Asia/Colombo');
 
@@ -92,6 +97,68 @@ function getWeatherBackground($description) {
     return 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=1920&q=80';
 }
 
+// Function to generate 5-day forecast
+function generate5DayForecast($location, $currentData) {
+    $forecast = [];
+    $currentTemp = $currentData['temp'];
+    $currentDesc = $currentData['description'];
+    
+    for ($day = 1; $day <= 5; $day++) {
+        $date = date('Y-m-d', strtotime("+$day day"));
+        $dayName = date('D', strtotime("+$day day"));
+        
+        // Gradual temperature changes ±3°C per day
+        $tempChange = (crc32($location . $date) % 7) - 3;
+        $forecastTemp = $currentTemp + $tempChange;
+        
+        // Occasional weather changes
+        $descriptions = ['clear sky', 'few clouds', 'scattered clouds', 'light rain', 'partly cloudy'];
+        $forecastDesc = $descriptions[(crc32($location . $date) % count($descriptions))];
+        
+        // Generate min/max temperatures
+        $minTemp = $forecastTemp - 2;
+        $maxTemp = $forecastTemp + 2;
+        
+        $forecast[] = [
+            'date' => $date,
+            'day' => $dayName,
+            'temp' => $forecastTemp,
+            'minTemp' => $minTemp,
+            'maxTemp' => $maxTemp,
+            'description' => $forecastDesc,
+            'humidity' => ($currentData['humidity'] + (crc32($date) % 11) - 5),
+            'windSpeed' => round(($currentData['wind_speed'] ?? $currentData['windSpeed'] ?? 3.0) + ((crc32($date) % 6) - 2) / 10, 1)
+        ];
+    }
+    
+    return $forecast;
+}
+
+// Function to check for weather alerts
+function checkWeatherAlerts($temp, $description, $humidity, $windSpeed) {
+    $alerts = [];
+    
+    if ($temp > 35) {
+        $alerts[] = ['type' => 'heat', 'message' => 'Extreme Heat Warning', 'icon' => '🔥'];
+    } elseif ($temp < 10) {
+        $alerts[] = ['type' => 'cold', 'message' => 'Cold Weather Advisory', 'icon' => '❄️'];
+    }
+    
+    if (strpos(strtolower($description), 'thunder') !== false || strpos(strtolower($description), 'storm') !== false) {
+        $alerts[] = ['type' => 'storm', 'message' => 'Thunderstorm Alert', 'icon' => '⛈️'];
+    }
+    
+    if ($humidity > 90) {
+        $alerts[] = ['type' => 'humidity', 'message' => 'High Humidity Alert', 'icon' => '💧'];
+    }
+    
+    if ($windSpeed > 7.0) {
+        $alerts[] = ['type' => 'wind', 'message' => 'Strong Wind Warning', 'icon' => '💨'];
+    }
+    
+    return $alerts;
+}
+
 // Function to generate consistent but slowly changing weather
 function generateRealisticWeather($location, $existingData = null) {
     // Base weather patterns for different regions - expanded for all locations
@@ -171,7 +238,7 @@ function generateRealisticWeather($location, $existingData = null) {
         $temp = $existingData['temp'];
         $description = $existingData['description'];
         $humidity = $existingData['humidity'];
-        $windSpeed = $existingData['wind_speed'];
+        $windSpeed = $existingData['wind_speed'] ?? $existingData['windSpeed'] ?? 3.0;
         
         // Small temperature changes (±2°C)
         $tempChange = ($seed % 5) - 2; // -2 to +2
@@ -311,6 +378,31 @@ if (isset($_POST['remove_favorite'])) {
         $_SESSION['favorites'] = array_values(array_diff($_SESSION['favorites'], [$favLocation]));
     }
     header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Handle comparison
+if (isset($_POST['compare_locations'])) {
+    $compareLocations = isset($_POST['compare']) ? $_POST['compare'] : [];
+    if (count($compareLocations) >= 2) {
+        $_SESSION['comparison'] = $compareLocations;
+    }
+}
+
+// Handle export to CSV
+if (isset($_GET['export']) && $_GET['export'] == 'csv' && isset($_SESSION['export_data'])) {
+    $data = $_SESSION['export_data'];
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=weather_data_' . date('Y-m-d') . '.csv');
+    
+    $output = fopen('php://output', 'w');
+    fputcsv($output, ['Location', 'Temperature (°C)', 'Weather', 'Humidity (%)', 'Wind Speed (m/s)', 'Population', 'Area (km²)']);
+    
+    foreach ($data as $loc => $values) {
+        fputcsv($output, [$loc, $values['temp'], $values['description'], $values['humidity'], $values['windSpeed'], $values['population'], $values['area']]);
+    }
+    
+    fclose($output);
     exit;
 }
 
@@ -473,8 +565,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
             $windSpeed = $data['windSpeed'];
             $population = $data['population'];
             $area = $data['area'];
+            
+            // Generate 5-day forecast
+            $forecast = generate5DayForecast($location, $data);
+            // Debug: Check forecast generation
+            // echo "<!-- Forecast generated: " . count($forecast) . " days -->";
+            
+            // Check for weather alerts
+            $weatherAlerts = checkWeatherAlerts($temperature, $description, $humidity, $windSpeed);
+            // Debug: Check alerts
+            // echo "<!-- Alerts generated: " . count($weatherAlerts) . " -->";
+            
+            // Store single location data for export
+            $_SESSION['export_data'] = [$location => $data];
         } else {
             $error = "Please select a valid location.";
+        }
+        
+        // Store all locations data for export if viewing all
+        if (isset($weatherData)) {
+            $_SESSION['export_data'] = $weatherData;
         }
         
         $conn->close();
@@ -489,6 +599,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
     <title>Sri Lanka Weather Tracker</title>
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Force no-cache -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <?php if (isset($description)): ?>
     <style>
         body {
@@ -502,6 +618,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
 </head>
 <body>
     <div class="container">
+        <!-- VERSION CHECK: v2.0 Enhanced Features -->
         <div class="header">
             <div class="header-time">
                 <?php echo date('l, F j, Y'); ?> | <span id="headerClock"><?php echo date('g:i:s A'); ?></span>
@@ -534,7 +651,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
         
         <form method="post" class="weather-form" id="weatherForm">
             <div class="form-group">
-                <select name="location" id="location" required>
+                <input type="text" id="searchBox" placeholder="🔍 Search locations..." class="search-box" style="display:block; width:100%; padding:15px; margin-bottom:15px; border-radius:15px; border:2px solid #4DB6AC; font-size:16px;">
+                <button type="button" class="geo-btn" id="geoBtn" onclick="detectLocation()" style="display:block; width:100%; padding:14px; margin-bottom:15px; background:linear-gradient(135deg, #00BFA5, #00ACC1); color:white; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer;">📍 Detect My Location</button>
+                <select name="location" id="location" required style="display:block; width:100%;">
                     <option value="">Select Location</option>
                     <option value="all_locations" <?php if(isset($location) && $location == 'all_locations') echo 'selected'; ?>>🌍 View All Locations</option>
                     <optgroup label="Western Province">
@@ -608,6 +727,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
             </div>
         </form>
 
+        <!-- DEBUG: Alerts Check -->
+        <?php if (isset($weatherAlerts) && !empty($weatherAlerts)): ?>
+        <div class="alerts-section" style="display:block !important; visibility:visible !important; margin:20px 0;">
+            <h3 style="color:white;">⚠️ Weather Alerts</h3>
+            <div class="alerts-grid">
+                <?php foreach ($weatherAlerts as $alert): ?>
+                <div class="alert-card alert-<?php echo $alert['type']; ?>">
+                    <span class="alert-icon"><?php echo $alert['icon']; ?></span>
+                    <span class="alert-message"><?php echo $alert['message']; ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php if (isset($error)): ?>
             <div class="error-message">
                 <span class="error-icon">⚠️</span>
@@ -617,6 +751,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
             <div class="weather-dashboard">
                 <div class="dashboard-header">
                     <h2>🌍 Weather Conditions Across Sri Lanka</h2>
+                    <div class="dashboard-actions">
+                        <a href="?export=csv" class="export-btn">📥 Export to CSV</a>
+                        <button onclick="exportToPDF()" class="export-btn">📄 Export to PDF</button>
+                    </div>
                     <div class="last-updated">
                         <span id="dashboardClock"><?php echo date('l, F j, Y - g:i:s A'); ?></span>
                     </div>
@@ -638,10 +776,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
                         <div class="stat-label">Avg Wind Speed</div>
                     </div>
                 </div>
+                <div class="weather-visualizations">
+                    <h3>📊 Weather Statistics</h3>
+                    <div class="charts-container">
+                        <div class="chart-box">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <canvas id="humidityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" id="compareForm">
                 <div class="table-container">
+                    <div class="comparison-actions">
+                        <button type="submit" name="compare_locations" class="compare-btn">📊 Compare Selected</button>
+                        <span class="compare-hint">Select 2+ locations to compare</span>
+                    </div>
                     <table class="weather-table">
                         <thead>
                             <tr>
+                                <th>Compare</th>
                                 <th>Location</th>
                                 <th>Temperature</th>
                                 <th>Weather</th>
@@ -654,6 +810,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
                         <tbody>
                             <?php foreach ($weatherData as $loc => $data): ?>
                                 <tr class="weather-row">
+                                    <td><input type="checkbox" name="compare[]" value="<?php echo htmlspecialchars($loc); ?>" class="compare-checkbox"></td>
                                     <td class="district-name"><?php echo $loc; ?></td>
                                     <td class="temperature"><?php echo $data['temp']; ?>°C</td>
                                     <td class="weather-desc">
@@ -669,6 +826,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
                         </tbody>
                     </table>
                 </div>
+                </form>
             </div>
         <?php elseif (isset($temperature)): ?>
             <div class="weather-card">
@@ -676,6 +834,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
                     <div>
                         <h2>📍 <?php echo htmlspecialchars($location); ?></h2>
                         <div class="card-time"><span id="cardClock"><?php echo date('g:i:s A'); ?></span></div>
+                        <div class="export-actions">
+                            <a href="?export=csv" class="export-btn-small">📥 CSV</a>
+                            <button onclick="exportCurrentToPDF()" class="export-btn-small">📄 PDF</button>
+                        </div>
                         <form method="post" style="margin-top: 10px;">
                             <?php if (isset($_SESSION['favorites']) && in_array($location, $_SESSION['favorites'])): ?>
                                 <button type="submit" name="remove_favorite" value="<?php echo htmlspecialchars($location); ?>" class="favorite-btn favorited">
@@ -720,12 +882,242 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['add_favorite']) && !i
                     <small>💡 Real-time weather tracking • Updates every 30 minutes • Sri Lanka Time (UTC+5:30)</small>
                 </div>
             </div>
+
+            <!-- DEBUG: Forecast Check -->
+            <?php if (isset($forecast) && is_array($forecast)): ?>
+            <div class="forecast-section" style="display:block !important; visibility:visible !important; opacity:1 !important;">
+                <h3 style="color:white; margin:20px 0;">📅 5-Day Weather Forecast</h3>
+                <div class="forecast-grid">
+                    <?php foreach ($forecast as $day): ?>
+                    <div class="forecast-card">
+                        <div class="forecast-day"><?php echo $day['day']; ?></div>
+                        <div class="forecast-date"><?php echo date('M j', strtotime($day['date'])); ?></div>
+                        <div class="forecast-emoji"><?php echo getWeatherEmoji($day['description']); ?></div>
+                        <div class="forecast-temp"><?php echo $day['temp']; ?>°C</div>
+                        <div class="forecast-range"><?php echo $day['minTemp']; ?>° / <?php echo $day['maxTemp']; ?>°</div>
+                        <div class="forecast-desc"><?php echo ucfirst($day['description']); ?></div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                
+                <div class="forecast-chart">
+                    <h4>📈 Temperature Trend</h4>
+                    <canvas id="forecastChart" style="width: 100%; height: 500px;"></canvas>
+                </div>
+                <script>
+                    // Direct inline chart initialization
+                    (function() {
+                        console.log('Starting forecast chart initialization...');
+                        
+                        // Wait for Chart.js to be available
+                        let attempts = 0;
+                        const maxAttempts = 20;
+                        
+                        function tryInitChart() {
+                            attempts++;
+                            console.log('Attempt', attempts, '- Chart available:', typeof Chart !== 'undefined');
+                            
+                            if (typeof Chart !== 'undefined') {
+                                const canvas = document.getElementById('forecastChart');
+                                if (!canvas) {
+                                    console.error('Canvas not found!');
+                                    return;
+                                }
+                                
+                                const forecastCards = document.querySelectorAll('.forecast-card');
+                                console.log('Found', forecastCards.length, 'forecast cards');
+                                
+                                if (forecastCards.length === 0) {
+                                    console.error('No forecast cards found!');
+                                    return;
+                                }
+                                
+                                const days = [];
+                                const temps = [];
+                                const minTemps = [];
+                                const maxTemps = [];
+                                
+                                forecastCards.forEach(card => {
+                                    const dayText = card.querySelector('.forecast-day')?.textContent || '';
+                                    const tempText = card.querySelector('.forecast-temp')?.textContent || '0';
+                                    const rangeText = card.querySelector('.forecast-range')?.textContent || '0 / 0';
+                                    
+                                    days.push(dayText);
+                                    temps.push(parseFloat(tempText));
+                                    
+                                    const parts = rangeText.split('/');
+                                    minTemps.push(parseFloat(parts[0]) || 0);
+                                    maxTemps.push(parseFloat(parts[1]) || 0);
+                                });
+                                
+                                console.log('Chart data:', { days, temps, minTemps, maxTemps });
+                                
+                                try {
+                                    new Chart(canvas, {
+                                        type: 'line',
+                                        data: {
+                                            labels: days,
+                                            datasets: [
+                                                {
+                                                    label: 'Average Temp',
+                                                    data: temps,
+                                                    borderColor: 'rgb(255, 159, 64)',
+                                                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                                    tension: 0.3,
+                                                    fill: true,
+                                                    borderWidth: 3
+                                                },
+                                                {
+                                                    label: 'Max Temp',
+                                                    data: maxTemps,
+                                                    borderColor: 'rgb(255, 99, 132)',
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                                                    tension: 0.3,
+                                                    borderDash: [5, 5],
+                                                    borderWidth: 2
+                                                },
+                                                {
+                                                    label: 'Min Temp',
+                                                    data: minTemps,
+                                                    borderColor: 'rgb(54, 162, 235)',
+                                                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                                                    tension: 0.3,
+                                                    borderDash: [5, 5],
+                                                    borderWidth: 2
+                                                }
+                                            ]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                title: {
+                                                    display: true,
+                                                    text: '5-Day Temperature Forecast',
+                                                    font: {
+                                                        size: 16
+                                                    }
+                                                },
+                                                legend: {
+                                                    display: true,
+                                                    position: 'top'
+                                                }
+                                            },
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: false,
+                                                    title: {
+                                                        display: true,
+                                                        text: 'Temperature (°C)'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                    console.log('✅ Forecast chart created successfully!');
+                                } catch (error) {
+                                    console.error('Error creating chart:', error);
+                                }
+                            } else if (attempts < maxAttempts) {
+                                setTimeout(tryInitChart, 200);
+                            } else {
+                                console.error('Chart.js failed to load after', maxAttempts, 'attempts');
+                            }
+                        }
+                        
+                        // Start trying
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', tryInitChart);
+                        } else {
+                            tryInitChart();
+                        }
+                    })();
+                </script>
+            </div>
+            <?php endif; ?>
         <?php endif; ?>
         
         <div class="footer">
             <p>© 2025 Sri Lanka Weather Tracker • Real-time tracking for 120+ locations • Powered by MRH</p>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="script.js?v=<?php echo time(); ?>"></script>
+    <script>
+        // Debug: Check if libraries are loaded
+        console.log('=== WEATHER APP DEBUG INFO ===');
+        console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+        console.log('jsPDF loaded:', typeof window.jspdf !== 'undefined');
+        console.log('Search box exists:', !!document.getElementById('searchBox'));
+        console.log('Geo button exists:', !!document.getElementById('geoBtn'));
+        console.log('Page version: 2.0 Enhanced');
+        console.log('===============================');
+        
+        // Ensure geolocation function is available globally
+        window.detectLocation = function() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+            
+            const geoBtn = document.getElementById('geoBtn');
+            if (geoBtn) {
+                geoBtn.textContent = '🔄 Detecting...';
+                geoBtn.disabled = true;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    // Sri Lankan coordinates
+                    if (lat >= 5.9 && lat <= 9.9 && lon >= 79.5 && lon <= 82.0) {
+                        const cities = [
+                            { name: 'Colombo', lat: 6.9271, lon: 79.8612 },
+                            { name: 'Kandy', lat: 7.2906, lon: 80.6337 },
+                            { name: 'Galle', lat: 6.0535, lon: 80.2210 },
+                            { name: 'Jaffna', lat: 9.6615, lon: 80.0255 },
+                            { name: 'Trincomalee', lat: 8.5874, lon: 81.2152 },
+                            { name: 'Anuradhapura', lat: 8.3114, lon: 80.4037 }
+                        ];
+                        
+                        let nearest = cities[0];
+                        let minDist = Math.sqrt(Math.pow(lat - cities[0].lat, 2) + Math.pow(lon - cities[0].lon, 2));
+                        
+                        cities.forEach(city => {
+                            const dist = Math.sqrt(Math.pow(lat - city.lat, 2) + Math.pow(lon - city.lon, 2));
+                            if (dist < minDist) {
+                                minDist = dist;
+                                nearest = city;
+                            }
+                        });
+                        
+                        const select = document.getElementById('location');
+                        select.value = nearest.name;
+                        if (geoBtn) {
+                            geoBtn.textContent = `✅ Found: ${nearest.name}`;
+                            setTimeout(() => {
+                                geoBtn.textContent = '📍 Detect My Location';
+                                geoBtn.disabled = false;
+                            }, 2000);
+                        }
+                    } else {
+                        alert('You appear to be outside Sri Lanka. Please select a location manually.');
+                        if (geoBtn) {
+                            geoBtn.textContent = '📍 Detect My Location';
+                            geoBtn.disabled = false;
+                        }
+                    }
+                },
+                function(error) {
+                    alert('Unable to detect location: ' + error.message);
+                    if (geoBtn) {
+                        geoBtn.textContent = '📍 Detect My Location';
+                        geoBtn.disabled = false;
+                    }
+                }
+            );
+        };
+    </script>
 </body>
 </html>
