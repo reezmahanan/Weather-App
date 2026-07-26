@@ -1,100 +1,86 @@
-# Sri Lanka Weather Tracker
+# Sri Lanka Weather Tracker 🌤️
 
-Real-time weather tracking application for 120+ locations across Sri Lanka, featuring 5-day forecasts, weather alerts, and advanced data visualization.
+A premium, full-screen responsive web dashboard providing real-time weather telemetry and 7-day forecasting for over 120 locations across all 9 provinces of Sri Lanka. Built with React and Vite.
 
-[![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)](https://php.net/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://javascript.com/)
-[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)](https://mysql.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-## Features
-
-- **120+ Locations** - Coverage across all 9 provinces of Sri Lanka
-- **5-Day Forecast** - Extended predictions with Chart.js visualizations
-- **Weather Alerts** - Real-time notifications for extreme conditions
-- **Geolocation** - Auto-detect nearest weather station
-- **Location Comparison** - Compare weather across multiple locations
-- **Data Export** - Export in CSV/PDF formats
-- **Glassmorphism UI** - Modern design with dynamic backgrounds
-- **Responsive** - Optimized for all devices
-
-## Screenshots
-
-<div align="center">
-
-**Dashboard**  
-![Dashboard](screenshots/dashboard.png)
-
-**Weather Forecast**  
-![Weather Forecast](screenshots/Weather%20Forecast.png)
-
-**Temperature Analytics**  
-![Temperature Analytics](screenshots/Temperature%20trend.png)
-
-**Weather Alerts**  
-![Weather Alerts](screenshots/Weather%20Aleart.png)
-
-</div>
-
-## Quick Start
-
-### Prerequisites
-
-- XAMPP with PHP 7.4+ and MySQL/MariaDB
-- Modern web browser
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/reezmahanan/Weather-App.git
-
-# Configure MySQL port (optional)
-# Edit my.ini: port = 3307
-
-# Start Apache and MySQL in XAMPP
-
-# Copy files to htdocs
-# Access: http://localhost/Weather-App/
-```
-
-Database and tables auto-create on first run.
-
-## Technology Stack
-
-**Backend:** PHP, MySQL, PDO  
-**Frontend:** HTML5, CSS3, JavaScript (ES6+), Chart.js  
-**Design:** Glassmorphism, CSS Grid/Flexbox  
-**Tools:** XAMPP, Git
-
-## Project Structure
-
-```
-Weather-App/
-├── index.php          # Main application
-├── script.js          # JavaScript functionality
-├── style.css          # Styling
-├── screenshots/       # Screenshots
-└── README.md          # Documentation
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/NewFeature`)
-3. Commit changes (`git commit -m 'Add NewFeature'`)
-4. Push to branch (`git push origin feature/NewFeature`)
-5. Open Pull Request
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Author
-
-**Reezma Hanan**  
-GitHub: [@reezmahanan](https://github.com/reezmahanan)
+![Dashboard Preview](dashboard_preview.png)
 
 ---
 
-⭐ Star this repo if you find it useful!
+## 🚀 Key Features
+
+* **📡 Live Real-Time Telemetry**: Connects directly to the keyless **Open-Meteo API** to fetch current temperature, apparent temperature, relative humidity, wind speed, WMO codes, and weather advisories for selected stations.
+* **📅 7-Day Forecasting**: Parses and renders a 7-day horizontal scroll deck with temperature ranges and condition emojis.
+* **📈 Interactive SVG Analytics**: Generates custom SVG trend graphs mapping Min/Max/Avg temperature curves dynamically. Includes SVG bar charts comparing conditions across top locations.
+* **🔍 Search & Filter Grid**: Quickly search and filter all 120+ weather stations. Includes a **Geolocation Finder** to automatically select the nearest station inside Sri Lanka.
+* **⭐ Favorite Bookmarks**: Bookmark favorite stations. Current conditions are loaded as live widget cards directly in the sidebar panel.
+* **📊 Multi-City Comparison Deck**: Select 2+ locations and compare them side-by-side in a horizontal comparison deck, highlighting the warmest location with a glowing border.
+* **📄 PDF Consolidated Reports**: Export and download formatted telemetry reports (single-station detailed sheets or consolidated all-locations summaries) via `jsPDF`.
+* **🎨 Customizable Wallpaper**: Choose from 6 high-fidelity background wallpapers (Sunny, Rainy, Cloudy, Storm, Foggy, Slate) that persist across page reloads.
+* **⚙️ Seeded Offline Simulator**: Utilizes a deterministic LCG (Linear Congruential Generator) weather simulator to populate data instantly on boot or as a reliable offline fallback.
+
+---
+
+## 🛠️ Technology Stack
+
+1. **Frontend Core**: React 19 (Hooks, Context, Memoized state updates)
+2. **Build Tool & Server**: Vite 8
+3. **Styling**: Vanilla CSS (Fluid flexbox/grids, glassmorphic card templates)
+4. **PDF Exports**: `jspdf` (Custom-drawn tables and layout sheets)
+
+---
+
+## 📂 Project Structure
+
+```
+Weather-App/
+├── src/
+│   ├── components/
+│   │   ├── AnalyticsDashboard.jsx  # National stats, SVG bar charts, location table
+│   │   ├── ComparisonTable.jsx    # Side-by-side horizontal compare deck
+│   │   ├── FavoritesList.jsx      # Bookmark cards listed in sidebar
+│   │   └── ForecastSection.jsx     # Hero weather details, warnings, SVG line trend graph
+│   ├── data/
+│   │   └── locations.js            # District coordinates, populations, land areas for 120+ cities
+│   ├── utils/
+│   │   ├── exporter.js             # jsPDF formatting scripts
+│   │   ├── geo.js                  # Haversine distance coords calculations
+│   │   └── weatherEngine.js        # API fetches, seeded random generator, WMO mappers
+│   ├── App.jsx                     # Dashboard controller managing state
+│   ├── index.css                   # Responsive styles, grid systems, custom variables
+│   └── main.jsx                    # Vite React app mount point
+├── index.html                      # App layout shell
+├── package.json                    # Dependencies and run scripts
+├── vercel.json                     # Vercel URL routing configuration
+└── vite.config.js                  # Vite configuration
+```
+
+---
+
+## 🚀 Running Locally
+
+### Prerequisites
+* [Node.js](https://nodejs.org/) (v18 or higher recommended)
+* npm (comes bundled with Node)
+
+### Installation
+Clone the repository and install the dependencies:
+```bash
+npm install
+```
+
+### Running Development Server
+Run the local development server with hot-reload listening on port `5173`:
+```bash
+npm run dev
+```
+Open [http://localhost:5173/](http://localhost:5173/) in your web browser.
+
+### Compiling Production Build
+Build and optimize the application assets for production distribution:
+```bash
+npm run build
+```
+The compiled files will be output to the `/dist` directory.
+
+---
+
